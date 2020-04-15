@@ -13,31 +13,54 @@ protocol BoardViewControllerDelegate: class {
 }
 
 class BoardViewController: UIViewController {
+        // MARK: - Properties
     
+    var board: GameBoard? {
+        didSet {
+            updateButtons()
+        }
+    }
+    
+    weak var delegate: BoardViewControllerDelegate?
+    
+    @IBOutlet var buttons: [UIButton]! {
+        didSet {
+                    for button in buttons {
+                button.layer.borderWidth = 2.0
+                button.layer.borderColor = UIColor.black.cgColor
+            }
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        for button in buttons {
-            button.layer.borderWidth = 2.0
-            button.layer.borderColor = UIColor.black.cgColor
-        }
         
         updateButtons()
     }
     
     @IBAction func mark(_ sender: UIButton) {
-        delegate?.boardViewController(self, markWasMadeAt: coordinate(for: sender))
+        let tag = sender.tag
+              let x = tag % 3
+              let y = tag / 3
+        
+        delegate?.boardViewController(self, markWasMadeAt: (x, y))
     }
     
     // MARK: - Private
 
     private func updateButtons() {
+        // Make sure the board is set
         guard let board = board, isViewLoaded else { return }
         
+        // Populate board with existing marks
         for x in 0..<3 {
             for y in 0..<3 {
+                
+                // coordinate based on both loops
                 let coord = (x, y)
                 let button = self.button(for: coord)
+                
+                // If the coordinate has a mark, we set the buttons title to the mark
                 if let mark = board[coord] {
                     button.setTitle(mark.stringValue, for: .normal)
                 } else {
@@ -51,23 +74,4 @@ class BoardViewController: UIViewController {
         let tag = coordinate.y * 3 + coordinate.x
         return view.viewWithTag(tag) as! UIButton
     }
-    
-    private func coordinate(for button: UIButton) -> Coordinate {
-        let tag = button.tag
-        let x = tag % 3
-        let y = tag / 3
-        return (x, y)
-    }
-    
-    // MARK: - Properties
-    
-    var board: GameBoard? {
-        didSet {
-            updateButtons()
-        }
-    }
-    
-    weak var delegate: BoardViewControllerDelegate?
-    
-    @IBOutlet var buttons: [UIButton]!
 }

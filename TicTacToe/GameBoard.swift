@@ -8,13 +8,29 @@
 
 import Foundation
 
-enum GameBoardError: Error, Equatable {
-    case invalidSquare
-}
 
 typealias Coordinate = (x: Int, y: Int)
 
 struct GameBoard {
+    
+//    enum Position {
+//        case topLeft
+//        case topCenter
+//        case topRight
+//        case middleLeft
+//        case middleCenter
+//        case middleRight
+//        case bottomLeft
+//        case bottomCenter
+//        case bottomRight
+//    }
+    
+    
+    enum GameBoardError: Error, Equatable {
+        case invalidSquare
+    }
+
+   
     
     enum Mark: Equatable {
         case x
@@ -32,7 +48,11 @@ struct GameBoard {
         case filled(Mark)
         case empty
     }
+    // Square =     grid
+        private var squares = Array(repeating: Square.empty, count: 9)
     
+    // Subscript function allows me to access objects inside the board using square brackets.  Parameter will serve as bracket's input.
+    // e.g. board[(0,0)] -> Mark?
     subscript(coordinate: Coordinate) -> Mark? {
         let square = squares[arrayIndex(for: coordinate)]
         if case let Square.filled(mark) = square {
@@ -42,10 +62,12 @@ struct GameBoard {
         }
     }
     
+    //
     mutating func place(mark: Mark, on square: Coordinate) throws {
         if self[square] != nil {
             throw GameBoardError.invalidSquare
         }
+        // Find the index (0) from the given coordinate (0,0)
         squares[arrayIndex(for: square)] = .filled(mark)
     }
     
@@ -62,5 +84,5 @@ struct GameBoard {
         return square.y * 3 + square.x
     }
     
-    private var squares = Array(repeating: Square.empty, count: 9)
+
 }
